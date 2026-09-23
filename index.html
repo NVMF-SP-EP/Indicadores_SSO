@@ -2031,14 +2031,16 @@ function renderIraSexYearCard(ind, container){
   };
   const hVals = years.map(y=> sumYear(rec[y] || rec[String(y)], 'Hombres'));
   const mVals = years.map(y=> sumYear(rec[y] || rec[String(y)], 'Mujeres'));
+  const totVals = years.map((y,i)=> (hVals[i]==null && mVals[i]==null) ? null : (hVals[i]||0)+(mVals[i]||0));
   const grandTotal = hVals.reduce((a,b)=>a+(b||0),0) + mVals.reduce((a,b)=>a+(b||0),0);
   if(grandTotal===0) return;
 
   const datasets = [
+    { label:'Total', data: totVals, borderColor: COLORS["Total"], backgroundColor: COLORS["Total"], borderWidth:2.5, pointRadius:3, pointBackgroundColor: COLORS["Total"], tension:.3, fill:false, spanGaps:false },
     { label:'Hombres', data: hVals, borderColor: COLORS["Hombres"], backgroundColor: COLORS["Hombres"], borderWidth:2.5, pointRadius:3, pointBackgroundColor: COLORS["Hombres"], tension:.3, fill:false, spanGaps:false },
     { label:'Mujeres', data: mVals, borderColor: COLORS["Mujeres"], backgroundColor: COLORS["Mujeres"], borderWidth:2.5, pointRadius:3, pointBackgroundColor: COLORS["Mujeres"], tension:.3, fill:false, spanGaps:false }
   ];
-  let legendItems = `<span><span class="dot" style="background:${COLORS["Hombres"]}"></span>Hombres</span><span><span class="dot" style="background:${COLORS["Mujeres"]}"></span>Mujeres</span>`;
+  let legendItems = `<span><span class="dot" style="background:${COLORS["Total"]}"></span>${state.comuna} (Total)</span><span><span class="dot" style="background:${COLORS["Hombres"]}"></span>Hombres</span><span><span class="dot" style="background:${COLORS["Mujeres"]}"></span>Mujeres</span>`;
 
   const isProvincialIraSex = comuna === "Servicio de Salud Osorno (total)";
   const provRecIraSex = (!isProvincialIraSex && cfg.data["Servicio de Salud Osorno (total)"]) ? cfg.data["Servicio de Salud Osorno (total)"] : null;
@@ -2055,6 +2057,7 @@ function renderIraSexYearCard(ind, container){
   const cvsId = 'c'+Math.random().toString(36).slice(2);
   const ariaParts = [];
   years.forEach((y,i)=>{
+    if(totVals[i]!=null) ariaParts.push(`Total ${y}: ${fmt(totVals[i],0)} egresos`);
     if(hVals[i]!=null) ariaParts.push(`Hombres ${y}: ${fmt(hVals[i],0)} egresos`);
     if(mVals[i]!=null) ariaParts.push(`Mujeres ${y}: ${fmt(mVals[i],0)} egresos`);
   });
